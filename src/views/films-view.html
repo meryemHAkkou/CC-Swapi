@@ -1,0 +1,80 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bootstrap-file.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../components/film-view.html">
+
+<dom-module id="films-view">
+	<template>
+		<style include="style-id">
+			:host {
+				display: block;
+
+				padding: 10px;
+			}
+		</style>
+		<iron-ajax auto url="https://swapi.co/api/films/?search={{title}}" handle-as="json" on-response="handleFilms">
+        </iron-ajax>
+		<div  class="row text-center" >
+			<div class="col-md-6 col-md-offset-3">
+				<h1> Films</h1>
+			</div>
+		</div>
+		<br>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <input type="text" id="search" class="form-control" placeholder="Name" value="">
+					</div>
+					<div class="col-md-2">
+                        <button class="btn btn-primary" on-click="update">Chercher</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+		<div  class="row text-center" >
+			<template is="dom-repeat" items="{{films}}" as="film">
+				<film-view class="col-md-4" film="[[film]]">
+
+				</film-view>
+			</template>
+		</div>
+	</template>
+
+	<script>
+		class filmsView extends Polymer.Element {
+			static get is() { return 'films-view'; }
+			static get properties() {
+                return {
+                    films: Array,
+                    title: String
+                };
+            }
+			connectedCallback() {
+				super.connectedCallback();
+				this.title = '';
+			}
+            handleFilms(response) {
+                this.films = response.detail.response.results;
+            }
+			update() {
+				console.log(this.$.search.value);
+				this.title = this.$.search.value;
+			}
+		}
+
+
+		window.customElements.define(filmsView.is, filmsView);
+	</script>
+</dom-module>

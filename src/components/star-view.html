@@ -1,0 +1,76 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="star-view">
+	<template>
+		<style include="shared-styles">
+			:host {
+				display: block;
+
+				padding: 10px;
+			}
+		</style>
+		<template is="dom-if" if="[[details]]">
+			<div class="card" style="width: 20rem;">
+				<img class="card-img-top" height="100" width="100" src="https://www.spacesector.com/blog/wp-content/uploads/solar_struggle.jpg">
+				<div class="card-block">
+					<h4 class="card-title">
+						<b> {{star.name}}</b>
+					</h4>
+
+					<a href='/star-details/[[star.id]]'>Details</a>
+				</div>
+			</div>
+		</template>
+		<template is="dom-if" if="[[!details]]">
+			<a href="/star-details/{{star.id}}">{{star.name}}</a>
+		</template>
+
+	</template>
+
+	<script>
+		class starView extends Polymer.Element {
+			static get is() { return 'star-view'; }
+			static get properties() {
+				return {
+					star: Object,
+					role: String,
+					url: Object
+				}
+			}
+			connectedCallback() {
+				super.connectedCallback();
+				this.details = this.role ? false : true;
+				console.log(this.url, this.details, this.role);
+				if(!this.details){
+					fetch(this.url)
+					.then(res => {
+						res.json()
+						.then(data => {
+							let tab = data.url.split('/');
+							data.id = tab[tab.length-2];
+							this.star = data;
+						});
+					});
+				} else {
+					let data = this.star;
+					let tab = data.url.split('/');
+					data.id = tab[tab.length-2];
+					this.star = data;
+				}
+			}
+		}
+
+		window.customElements.define(starView.is, starView);
+	</script>
+</dom-module>

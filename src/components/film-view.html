@@ -1,0 +1,74 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../shared-styles.html">
+
+
+<dom-module id="film-view">
+	<template>
+		<style include="shared-styles">
+			:host {
+				display: block;
+
+				padding: 10px;
+			}
+		</style>
+		<template is="dom-if" if="[[details]]">
+			<div class="card" style="width: 20rem;">
+				<img class="card-img-top" width="250" src="http://greenscarriages.com/wp-content/uploads/2016/11/film-reel.png" >
+				<div class="card-block">
+					<h4 class="card-title"><b>{{film.title}}</b></h4>
+					
+					<a href='/film-details/[[film.id]]'>Details</a>
+				</div>
+			</div>
+		</template>
+		<template is="dom-if" if="[[!details]]">
+			<a href="/film-details/{{film.id}}">{{film.title}}</a>
+		</template>
+	</template>
+
+	<script>
+		class filmView extends Polymer.Element {
+			static get is() { return 'film-view'; }
+			static get properties() {
+				return {
+					film: Object,
+					role: String,
+					url: Object
+				}
+			}
+			connectedCallback() {
+				super.connectedCallback();
+				this.details = this.role ? false : true;
+				if(!this.details){
+					fetch(this.url)
+					.then(res => {
+						res.json()
+						.then(data => {
+							let tab = data.url.split('/');
+							data.id = tab[tab.length-2];
+							this.film = data;
+						});
+					});
+				} else {
+					let data = this.film;
+					let tab = data.url.split('/');
+					data.id = tab[tab.length-2];
+					this.film = data;
+				}
+			}
+		}
+
+
+		window.customElements.define(filmView.is, filmView);
+	</script>
+</dom-module>

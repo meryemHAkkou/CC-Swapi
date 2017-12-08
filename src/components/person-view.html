@@ -1,0 +1,78 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../shared-styles.html">
+
+
+<dom-module id="person-view">
+	<template>
+		<style include="shared-styles">
+			:host {
+				display: block;
+
+				padding: 10px;
+			}
+		</style>
+		
+		<template is="dom-if" if="[[details]]">
+			<div class="card" style="width: 20rem;">
+				<img class="card-img-top" height="100" width="100" src="http://p7.storage.canalblog.com/71/08/496043/48475674.jpg">
+				<div class="card-block">
+					<h4 class="card-title">
+						<b>{{person.name}}</b>
+					</h4>
+	
+					<a href='/person-details/[[person.id]]'>Details</a>
+				</div>
+			</div>
+		</template>
+		<template is="dom-if" if="[[!details]]">
+			<a href="/person-details/{{person.id}}">{{person.name}}</a>
+		</template>
+
+	</template>
+	<script>
+		class personView extends Polymer.Element {
+			static get is() { return 'person-view'; }
+			static get properties() {
+				return {
+					person: Object,
+					role: String,
+					url: Object
+				}
+			}
+			connectedCallback() {
+				super.connectedCallback();
+				console.log('Hell')
+				this.details = this.role ? false : true;
+				if(!this.details){
+					fetch(this.url)
+					.then(res => {
+						res.json()
+						.then(data => {
+							let tab = data.url.split('/');
+							data.id = tab[tab.length-2];
+							this.person = data;
+						});
+					});
+				} else {
+					let data = this.person;
+					let tab = data.url.split('/');
+					data.id = tab[tab.length-2];
+					this.person = data;
+				}
+			}
+
+		}
+
+		window.customElements.define(personView.is, personView);
+	</script>
+</dom-module>

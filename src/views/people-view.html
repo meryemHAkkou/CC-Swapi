@@ -1,0 +1,77 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bootstrap-file.html">
+<link rel="import" href="../components/person-view.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="people-view">
+	<template>
+		<style include="style-id">
+			:host {
+				display: block;
+
+				padding: 10px;
+			}
+		</style>
+		<iron-ajax auto url="https://swapi.co/api/people/?search={{name}}" handle-as="json" on-response="handlePeople">
+        </iron-ajax>
+		<div class="row text-center">
+			<div class="col-md-6 col-md-offset-3">
+				<h1>
+					<b> People</b>
+				</h1>
+			</div>
+		</div>
+		<br>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <input type="text" id="search" class="form-control" placeholder="Name" value="">
+					</div>
+					<div class="col-md-2">
+                        <button class="btn btn-primary" on-click="update">Chercher</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+		<template is="dom-repeat" items="{{people}}" as="p">
+			<person-view class="col-md-4" person="[[p]]"></person-view>
+		</template>
+	</template>
+
+	<script>
+		class peopleView extends Polymer.Element {
+			static get is() { return 'people-view'; }
+			static get properties() {
+                return {
+                    people: Array,
+                    name: String
+                };
+            }
+			connectedCallback() {
+				super.connectedCallback();
+				this.name = '';
+			}
+            handlePeople(response) {
+                this.people = response.detail.response.results;
+            }
+			update() {
+				console.log(this.$.search.value);
+				this.name = this.$.search.value;
+			}
+		}
+
+		window.customElements.define(peopleView.is, peopleView);
+	</script>
+</dom-module>

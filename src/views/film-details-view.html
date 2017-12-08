@@ -1,0 +1,71 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="../components/star-view.html">
+<link rel="import" href="../components/person-view.html">
+
+<dom-module id="film-details-view">
+	<template>
+		<style include="shared-styles">
+			:host {
+				display: block;
+
+				padding: 10px;
+			}
+		</style>
+		<app-route route="{{route}}" pattern="/:id" data="{{routeData}}" tail="{{subroute}}">
+		</app-route>
+		<center>
+			<h1>Film</h1> {{film.title}}
+			<br>
+			<br>
+			<h1>People</h1>
+			<template is="dom-repeat" items="{{film.characters}}" as="acteur">
+				<person-view role="details" url="{{acteur}}"></person-view>	
+			</template>
+			</br>
+			<h1>Starships</h1>
+			<template is="dom-repeat" items="{{film.starships}}" as="starship">
+				<star-view role="details" url="{{starship}}"></star-view>
+			</template>
+		</center>
+
+	</template>
+
+	<script>
+		class filmDetailsView extends Polymer.Element {
+			static get is() { return 'film-details-view'; }
+			static get properties() {
+				return {
+					film: {
+						type: Object,
+						observer: '_Charger'
+					}
+				}
+			}
+
+			connectedCallback() {
+				super.connectedCallback();
+				fetch('https://swapi.co/api/films/' + this.routeData.id)
+					.then(Reponse => Reponse.json().then(fct => this.film = fct));
+			}
+			_Charger() {
+
+				fetch('https://swapi.co/api/films/' + this.routeData.id)
+					.then(Reponse => Reponse.json().then(fct => this.film = fct));
+			}
+		}
+
+
+		window.customElements.define(filmDetailsView.is, filmDetailsView);
+	</script>
+</dom-module>

@@ -1,0 +1,62 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="../components/star-view.html">
+<link rel="import" href="../components/film-view.html">
+
+<dom-module id="person-details-view">
+	<template>
+		<style include="shared-styles">
+			:host {
+				display: block;
+
+				padding: 10px;
+			}
+		</style>
+		<app-route route="{{route}}" pattern="/:id" data="{{routeData}}" tail="{{subroute}}">
+		</app-route>
+		<iron-ajax auto url="https://swapi.co/api/people/{{routeData.id}}/" handle-as="json" on-response="handle">
+        </iron-ajax>
+		<center>
+			<h1>Person</h1> {{people.name}}
+			<br>
+			<h3>Films</h3>
+			<template is="dom-repeat" items="{{people.films}}" as="film">
+				<film-view role="details" url="{{film}}"></film-view>
+			</template>
+			</br>
+			<h3>Starships</h3>
+			<template is="dom-repeat" items="{{people.starships}}" as="starship">
+				<star-view role="details" url="{{starship}}"></star-view>
+			</template>
+		</center>
+
+	</template>
+
+	<script>
+		class personDetailsView extends Polymer.Element {
+			static get is() { return 'person-details-view'; }
+			static get properties() {
+                return {
+                    route: Object,
+                    people: Object
+                };
+            }
+			handle(response) {
+                this.people = response.detail.response;
+            }
+		}
+
+		window.customElements.define(personDetailsView.is, personDetailsView);
+	</script>
+</dom-module>
